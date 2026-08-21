@@ -1,0 +1,11 @@
+# Source material — never commit. Notebooks and exports may contain internal
+# hostnames, credentials, or raw customer-level data.
+*.ipynb
+*.csv
+*.png
+*.pptx
+*.xlsx
+data/
+.ipynb_checkpoints/
+
+.DS_Store
