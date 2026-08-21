@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reversal Risk Scoring — Case Study</title>
-<meta name="description" content="A case study on building a model to predict ACH payment reversals — including a bug in its own headline result, found after that result reached stakeholders, and the fix.">
+<meta name="description" content="A case study on building a model to predict ACH payment reversals, including a bug in its own headline result, found after that result reached stakeholders, and the fix.">
 <style>
   /* ---------- Tokens ---------- */
   :root {
@@ -569,11 +569,11 @@
   <div class="container">
     <div class="kicker">Model case study</div>
     <h1>Reversal Risk Scoring for Guaranteed ACH Payments</h1>
-    <p class="dek">A lender pays a vendor to insure every bill payment against reversing — but
-      most payments were never going to reverse. This case study tests whether the lender's own
-      data can spot the safe ones well enough to stop paying for them. The answer: nearly, but
-      not yet — and getting there meant finding and fixing a serious bug in the model's first,
-      too-good-to-be-true result.</p>
+    <p class="dek">A lender pays a vendor to insure every bill payment against reversing. Most
+      payments were never going to reverse in the first place. This case study asks whether the
+      lender's own data can spot the safe ones well enough to stop paying for them. The answer is
+      nearly, but not yet, and getting there meant finding and fixing a serious bug in the
+      model's first result.</p>
     <div class="brief-strip tabular">
       <div class="brief-stat"><span class="brief-num">0.8462</span><span class="brief-label">AUC, scored on a month the model never saw</span></div>
       <div class="brief-stat"><span class="brief-num">52%</span><span class="brief-label">of all reversals caught in the riskiest 10% of payments</span></div>
@@ -602,15 +602,14 @@
     <div class="container">
       <div class="section-head"><span class="section-num">01</span><h2>The problem</h2></div>
       <div class="prose">
-        <p class="lede">An ACH bill payment can look successful and then reverse days later —
-          the money comes back out, and the lender is on the hook. A third-party vendor sells
-          insurance against exactly this: for a percentage of every payment routed through its
-          "guaranteed" product, the vendor eats the loss if that payment reverses.</p>
-        <p>Roughly 96% of payments were never going to reverse. That means most of what the
-          lender pays the vendor is insuring transactions that were already safe. If a model can
-          reliably tell the safe payments apart from the risky ones, the safe ones can skip the
-          vendor and its fee.</p>
-        <p>That's a buy-vs-build question, not a modeling question — the model is just the
+        <p class="lede">An ACH bill payment can look successful and then reverse days later. The
+          money comes back out, and the lender is on the hook. A third-party vendor sells
+          insurance against this. For a percentage of every payment routed through its
+          "guaranteed" product, the vendor covers the loss if that payment reverses.</p>
+        <p>Roughly 96% of payments were never going to reverse. Most of what the lender pays the
+          vendor is insuring transactions that were already safe. If a model can tell the safe
+          payments apart from the risky ones, the safe ones can skip the vendor and its fee.</p>
+        <p>That's a buy-vs-build question, not a modeling question. The model is just the
           instrument for answering it.</p>
       </div>
     </div>
@@ -621,16 +620,17 @@
     <div class="container">
       <div class="section-head"><span class="section-num">02</span><h2>The data</h2></div>
       <div class="prose">
-        <p class="lede">82,841 bill payments over two months: 42,138 for training the model,
-          40,703 held out to test it. Of those, 3,385 reversed — a 4.1% rate.</p>
+        <p class="lede">The dataset covers 82,841 bill payments over two months. 42,138 went to
+          training the model, and 40,703 were held out to test it. Of those, 3,385 reversed, a
+          4.1% rate.</p>
       </div>
 
       <div class="explainer">
         <div class="explainer-label">In plain terms</div>
-        <p>If a model just guessed "safe" on every single payment, it would be right 95.9% of
-          the time — and completely useless, since it would catch none of the risky ones. That's
-          why plain accuracy never appears on this page, and why the model is weighted to take
-          the rare, risky cases seriously.</p>
+        <p>If a model guessed "safe" on every payment, it would be right 95.9% of the time and
+          still useless, since it would catch none of the risky ones. That's why accuracy doesn't
+          appear on this page, and why the model is weighted to take the rare, risky cases
+          seriously.</p>
       </div>
 
       <div class="table-scroll">
@@ -671,12 +671,12 @@
         <li>Days since last reversal</li>
       </ul>
       <div class="prose">
-        <p>About 45% of rows are missing vendor signals entirely — those payments ran through a
+        <p>About 45% of rows have no vendor signals at all. Those payments ran through a
           different processor the vendor never scored.</p>
-        <p>The split is by month, not random: train on the earlier month, test on the later one.
-          A random split would let the model learn from a later month to predict an earlier one —
-          not something it can do once it's actually running. Splitting by time mirrors how it
-          operates in production.</p>
+        <p>The split is by month, not random. Train on the earlier month, test on the later one.
+          A random split would let the model learn from a later month to predict an earlier one,
+          and in production it never gets to do that. Splitting by time just mirrors how it
+          actually runs.</p>
       </div>
     </div>
   </section>
@@ -745,15 +745,15 @@
           </table>
         </div>
         <div class="prose">
-          <p>On average precision — the metric that counts here — owned data is worth about six
-            times what the algorithm change is worth. Measured against the 0.040 random-guessing
-            baseline, the three models score 6.1x, 6.6x, and 9.2x.</p>
+          <p>On average precision, the metric that counts here, owned data is worth about six
+            times what the algorithm change is worth. Against the 0.040 random-guessing baseline,
+            the three models score 6.1x, 6.6x, and 9.2x.</p>
         </div>
       </div>
 
       <div class="table-scroll">
         <table class="data-table">
-          <caption>Best model, held-out month — 39,058 payments that were fine, 1,645 that reversed</caption>
+          <caption>Best model, held-out month (39,058 payments that were fine, 1,645 that reversed)</caption>
           <thead>
             <tr><th class="num">Correctly cleared</th><th class="num">False alarms</th><th class="num">Missed</th><th class="num">Caught</th></tr>
           </thead>
@@ -785,22 +785,22 @@
     <div class="container">
       <div class="section-head"><span class="section-num">04</span><h2>The bug</h2></div>
 
-      <p class="statement">The first version of the model scored 0.97 AUC — near-perfect. That
+      <p class="statement">The first version of the model scored 0.97 AUC, near-perfect. That
         should have been the tip-off.</p>
 
       <div class="prose">
         <p>One feature counted how many times a customer had reversed a payment before. But the
           way it was written, a payment that was itself a reversal counted itself. Every risky
           payment in the training data arrived carrying a clue that it was risky. The model
-          wasn't predicting anything — it was reading the answer key.</p>
-        <p>How it surfaced: not from review. It came up while building a different feature —
-          days since the customer's last reversal — which forced the question of what "last"
-          means relative to the payment being scored. That question exposed that the original
-          feature had never asked it.</p>
-        <p>The fix: count only payments that came strictly before the one being scored. That
-          count also has to look back across the customer's entire history, not just the study
-          period — otherwise customers who joined early look artificially clean, since their
-          real prior reversals would fall outside a truncated window.</p>
+          wasn't predicting anything. It was reading the answer key.</p>
+        <p>It wasn't caught by review. It came up while building a different feature, days since
+          the customer's last reversal, which meant deciding what "last" means relative to the
+          payment being scored. Answering that showed the original feature had never asked the
+          question at all.</p>
+        <p>The fix was to count only payments that came strictly before the one being scored.
+          That count also has to look back across the customer's entire history, not just the
+          study period. Otherwise customers who joined early look artificially clean, because
+          their real prior reversals fall outside a truncated window.</p>
       </div>
 
       <div class="spec-block" aria-label="Corrected feature definition, pseudocode"><span class="cmt">// counts only rows strictly before the one being scored</span>
@@ -811,14 +811,14 @@ prior_reversal_count(customer, t) =
        study-window restriction applied after</span></div>
 
       <div class="prose">
-        <p>This was not a train/test split problem. The split was correct the whole time. The
-          bug lived inside the feature definition, which means no amount of validation
-          discipline would have caught it — cross-validation would have reported the same
-          inflated number, just as confidently.</p>
+        <p>This wasn't a train/test split problem. The split was correct the whole time. The bug
+          lived inside the feature definition, so no amount of validation discipline would have
+          caught it. Cross-validation would have reported the same inflated number, just as
+          confidently.</p>
       </div>
 
       <div class="correction">
-        <h3 class="sub">Same pipeline, same split — before and after the fix</h3>
+        <h3 class="sub">Same pipeline, same split, before and after the fix</h3>
         <div class="correction-grid cols-2">
           <div class="metric-pair">
             <div class="metric-name">AUC</div>
@@ -843,16 +843,16 @@ prior_reversal_count(customer, t) =
     <div class="container">
       <div class="section-head"><span class="section-num">05</span><h2>Testing it properly</h2></div>
       <div class="prose">
-        <p class="lede">The corrected model was scored on a later month it had never seen — a
-          real forward test, not a re-shuffle of the same data. 70,842 payments, 3,212 of which
-          reversed.</p>
+        <p class="lede">The corrected model was scored on a later month it had never seen at
+          all, a real forward test rather than a re-shuffle of the same data. 70,842 payments,
+          3,212 of which reversed.</p>
       </div>
 
       <p class="statement">AUC 0.8462, average precision 0.3626.</p>
 
       <div class="prose">
-        <p>Average precision barely moved — 0.366 in testing, 0.363 scored forward on brand-new
-          data. That's the meaningful part: the model holds up.</p>
+        <p>Average precision barely moved, from 0.366 in testing to 0.363 scored forward on
+          brand-new data. The model holds up.</p>
       </div>
 
       <p class="statement">The riskiest 10% of payments contains 52% of all the reversals.</p>
@@ -887,7 +887,7 @@ prior_reversal_count(customer, t) =
           </tbody>
         </table>
       </div>
-      <p class="fig-note">Perfectly ordered, top to bottom — no inversions, on roughly 1,673 real events in the riskiest group alone.</p>
+      <p class="fig-note">Perfectly ordered, top to bottom, with no inversions, on roughly 1,673 real events in the riskiest group alone.</p>
 
       <h3 class="sub">Calibration: does a predicted 30% chance actually mean 30%?</h3>
       <div class="table-scroll">
@@ -908,10 +908,10 @@ prior_reversal_count(customer, t) =
       <div class="gap-legend"><span class="swatch"><span class="dot" style="background:var(--paper-raised);border:2px solid var(--muted-fill)"></span>Predicted</span><span class="swatch"><span class="dot" style="background:var(--ink-fill)"></span>Actual</span></div>
 
       <div class="prose">
-        <p>The safe end is accurate, which is the end that matters — those are the payments that
-          would get routed away from the vendor. The overconfidence sits in the middle band,
-          which gets sent to the vendor regardless. Still a real weakness, just a well-placed
-          one.</p>
+        <p>The safe end is accurate, and that's the end that matters, since those are the
+          payments that would get routed away from the vendor. The overconfidence sits in the
+          middle band, which gets sent to the vendor either way. It's still a real weakness, just
+          a well-placed one.</p>
       </div>
 
       <h3 class="sub">Where to draw the line</h3>
@@ -945,14 +945,14 @@ prior_reversal_count(customer, t) =
 
       <div class="prose" style="margin-top:1.75rem;">
         <p>Best case clears about 31% of payments (30.9%) while still catching 98% of reversals
-          (98.4%) — real, but the margin is thin, and it turns negative above about 0.10.
-          Precision at the best setting is 6.5%: of every 100 payments flagged risky, about 7
-          actually reverse. The model is a strong ranker (it puts payments in the right order)
-          and a weak classifier (pick any single cutoff and most of what it flags turns out
-          fine) — and ranking is what this use case needs, but not by enough yet to justify
-          dropping the vendor.</p>
-        <p>A qualified negative is still a useful answer. It tells the business exactly how much
-          better the model needs to get, and which customers to focus on first.</p>
+          (98.4%). That's real, but the margin is thin, and it turns negative above about 0.10.
+          Precision at the best setting is 6.5%, so of every 100 payments flagged risky, about 7
+          actually reverse. The model is a strong ranker: it puts payments in the right order.
+          It's a weak classifier: pick any single cutoff and most of what it flags turns out
+          fine. Ranking is what this use case needs, but not by enough yet to justify dropping
+          the vendor.</p>
+        <p>A qualified negative is still a useful answer. It tells the business how much better
+          the model needs to get, and which customers to focus on first.</p>
       </div>
     </div>
   </section>
@@ -983,10 +983,10 @@ prior_reversal_count(customer, t) =
           </table>
         </div>
         <div class="prose">
-          <p>An 8x spread in real outcomes — 35.2% down to 4.5% — that the model was compressing
-            into about 2x, because it had no sense of time. After adding it as a feature, average
-            precision went 0.319 → 0.366, and it became the single most important feature in the
-            model.</p>
+          <p>Real outcomes span 8x across these buckets, from 35.2% down to 4.5%. The model was
+            compressing that into about 2x, because it had no sense of time. After adding the
+            feature, average precision went from 0.319 to 0.366, and it became the single most
+            important feature in the model.</p>
         </div>
       </div>
 
@@ -996,9 +996,8 @@ prior_reversal_count(customer, t) =
         <div class="prose">
           <p>Two reversals out of three payments is a very different customer from two out of
             two hundred, and the model couldn't tell them apart. Adding prior transaction count
-            and prior reversal rate fixed the worst calibration error: the model used to
-            overestimate risk about 7x for customers with no history, and now it's accurate
-            there.</p>
+            and prior reversal rate fixed the worst calibration error. The model used to
+            overestimate risk about 7x for customers with no history. Now it's accurate there.</p>
         </div>
       </div>
 
@@ -1113,8 +1112,8 @@ prior_reversal_count(customer, t) =
         </div>
       </div>
 
-      <div class="panel-note">Panel 5 is not a standard inclusion. It exists because of section
-        04 — the monitoring here is a direct consequence of what went wrong, not a best-practice
+      <div class="panel-note">Panel 5 isn't a standard inclusion. It exists because of section
+        04. The monitoring here is a direct consequence of what went wrong, not a best-practice
         checkbox.</div>
     </div>
   </section>
@@ -1138,7 +1137,7 @@ prior_reversal_count(customer, t) =
   <div class="container">
     <p>Figures on this page are exact, drawn from a real internal project at a US fintech lender.
       Company name, vendor identity, dollar amounts, and internal field names have been
-      withheld; everything else — every rate, count, and score — is reported as measured.</p>
+      withheld. Everything else, every rate, count, and score, is reported as measured.</p>
   </div>
 </footer>
 
